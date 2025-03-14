@@ -12,37 +12,46 @@ const customerQueue = [
     { name: "Ryan", wantsControllers: 1, wantsGame: "Zelda: Echoes of Time", maxBudget: 350 }
 ];
 
-const currentTime = "12:05 AM"; // After midnight, purchases allowed
-const [hours, minutes] = currentTime.split(/:|/);
+const currentTime = "00:05"; // After midnight, purchases allowed
+const [hours] = currentTime.split(/:| /);
 let hour = parseInt (hours);
-let mins = parseInt(minutes);
 
- 
+function sell(time, bundles, customers){
+    if (time>12){
+        console.log("Not after midnight. Can not buy any bundles! Please wait until later!")
+    }else{
+        output = []
 
-function sell(currentTime, bundles, customers){
-    output = []
-
-    while (bundles.length > 0){ //while there are still bundles, run while loop
-        for(i=0; i < customers.lenth; i++){ //while i is less than the amount of customers 
-            bundles.forEach((bundle)=> { //iterate through bundles 
-                if (customers[i].wantsControllers===bundle.controllers && bundle.games.includes(customers[i].wantsGame) && customers.maxBudget >= bundle.price){ //if customer wants are met
-                    output.push({ //add customer and their purchase
-                        customer: `${customers[i].name}`,
-                        bundle: `${bundle.name}`,
-                        pricePaid:`${bundle.price}`
-                    })
-                    bundle.stock-- //remove 1 stock of that bundle
-                    x = bundles.forEach((bundle) => bundle.stock <= 0); //check if there is still any bundles left
-                    x.remove() //if no more stock, remove from list of bundles
-                }else{
-                    output.push({ //no bundles matched what customer wanted
-                        customer: `${customers[i].name}`,
-                        status: `Left empty-handed (No suitable bundle)`
-                    })
-                }
-            })
+        while (bundles.length > 0){ //while there are still bundles, run while loop
+            for(i=0; i < customers.length; i++){ //while i is less than the amount of customers 
+                let exists = false
+                bundles.forEach((bundle)=> { //iterate through bundles 
+                    if (customers[i].wantsControllers === bundle.controllers && (bundle.games.includes(customers[i].wantsGame) || customers[i].wantsGames===null) && customers[i].maxBudget >= bundle.price){ //if customer wants are met
+                        if (output.find((customer) => customers[i].name === customer.name)){
+                            exists = true
+                        }else{
+                            output.push({ //add customer and their purchase
+                                customer: `${customers[i].name}`,
+                                bundle: `${bundle.name}`,
+                                pricePaid:`${bundle.price}`
+                            })
+                        }
+                        bundle.stock-- //remove 1 stock of that bundle
+                        if(bundle.stock<=0){
+                            bundle.remove()
+                        } 
+                    }else{
+                        output.push({ //no bundles matched what customer wanted
+                            customer: `${customers[i].name}`,
+                            status: `Left empty-handed (No suitable bundle)`
+                        })
+                    }
+                })
+            }
+            return console.log(output)
         }
-        return output
+        return console.log(output)
     }
-    return output
 }
+
+sell(hour, switch2Bundles, customerQueue)
